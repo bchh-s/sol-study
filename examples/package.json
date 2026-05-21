@@ -1,0 +1,24 @@
+{
+  "name": "solana-examples",
+  "version": "1.0.0",
+  "description": "Solana devnet 실습 예제",
+  "scripts": {
+    "01": "ts-node 01-create-accounts.ts",
+    "02": "ts-node 02-airdrop-sol.ts",
+    "03": "ts-node 03-create-spl-token.ts",
+    "04": "ts-node 04-transfer-sol.ts",
+    "05": "ts-node 05-transfer-spl-token.ts",
+    "06": "ts-node 06-fee-payer.ts",
+    "07": "ts-node 07-monitor-tx.ts"
+  },
+  "dependencies": {
+    "@solana/spl-token": "^0.4.12",
+    "@solana/web3.js": "^1.98.0",
+    "bs58": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.0"
+  }
+}
