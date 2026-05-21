@@ -1,53 +1,64 @@
 # 14. 결론
 
-원문: ../solana-integration-research.md
+## 통합 가능성 요약
 
-## 이 폴더의 목표
+Dagaon Core에 Solana 체인을 통합하는 것은 **기술적으로 실현 가능하며, 기존 아키텍처의 60-70%를 재사용할 수 있다.** Solana의 근본적인 차이(mempool 부재, 슬롯 기반 블록, balance diff 기반 전송 감지, Ed25519 서명)는 새로운 구현이 필요하지만, Dagaon Core의 플러그인 아키텍처 덕분에 기존 EVM 파이프라인에 영향을 주지 않고 독립적으로 추가할 수 있다.
 
-통합 가능성 결론을 실행 가능한 next action으로 압축한다.
+## 핵심 판단
 
-## 원문에서 먼저 볼 소제목
+| 영역 | 판단 | 근거 |
+|------|------|------|
+| 인프라 재사용 | **높음** | Kafka/S3, etcd HA, Plugin registry는 체인 무관 |
+| KMS 통합 | **가능** | AWS KMS Ed25519 GA (2025.11), 라이브러리 존재 |
+| 입금 파이프라인 | **단순화** | finalized commitment → Event Confirmer 불필요, ~13초 확정 |
+| 출금 파이프라인 | **복잡성 증가** | durable nonce 풀 관리, 재전송 루프 등 새로운 운영 패턴 |
+| 데이터 볼륨 | **주의 필요** | EVM 대비 100x+ TPS, gRPC/Geyser 또는 필터링 전략 필수 |
+| 리스크 | **관리 가능** | HIGH 리스크 3건 모두 알려진 완화 전략 존재 |
 
-  - 재사용 가능한 것:
-  - 새로 구현해야 하는 것:
-  - 오히려 좋아지는 것:
+## Solana 통합의 본질
 
-## 개발할 내용
+이 프로젝트는 **EVM 확장이 아니라 새로운 체인 어댑터 추가**이다. 공유할 수 있는 인프라는 최대한 재사용하되, 체인별 차이는 전용 컴포넌트로 처리한다. 이 관점이 설계 전반에 일관되게 적용되어야 한다.
 
-1. 재사용/신규/삭제 항목을 최종 architecture diagram에 반영한다.
-2. 가장 먼저 검증할 3개 spike를 만든다: KMS Ed25519 signing, finalized block scan, durable nonce withdrawal.
-3. 경영/운영 공유용 1-page summary를 작성한다.
+```
+Dagaon Core 아키텍처:
 
-## 공부할 내용
+                    ┌─────────────────────┐
+                    │   공통 인프라 레이어    │
+                    │  Kafka / S3 / etcd   │
+                    │  KMS / Plugin Reg.   │
+                    └──────────┬──────────┘
+                               │
+              ┌────────────────┼────────────────┐
+              │                │                │
+    ┌─────────┴──────┐ ┌──────┴──────┐  ┌──────┴──────┐
+    │  EVM Adapter   │ │ Solana Adpt │  │ Future Chain│
+    │ Block Publisher│ │ Slot Scanner│  │   Adapter   │
+    │ Event Log 추출 │ │ Balance Diff│  │     ...     │
+    │ Event Confirmer│ │ (Confirmer  │  │             │
+    │ Nonce 관리     │ │  생략)      │  │             │
+    │ Gas 관리       │ │ Nonce Pool  │  │             │
+    └────────────────┘ └─────────────┘  └─────────────┘
+```
 
-1. Solana 통합이 EVM 확장 작업이 아니라 별도 chain adapter 추가라는 관점을 정리한다.
-2. 좋아지는 점(finality/fee delegation)과 나빠지는 점(nonce pool/RPC volume)을 균형 있게 설명할 수 있게 연습한다.
+## 투자 대비 효과
 
-## 실습/검증 과제
+| 투자 | 효과 |
+|------|------|
+| 12주 개발 | SOL + 모든 SPL 토큰 지원 |
+| ~0.5 SOL 초기 비용 | nonce 풀(환불 가능) + ATA 비용 |
+| 5-6개 새 DB 테이블 | 기존 EVM 무영향 |
+| 새 운영 패턴 학습 | 향후 non-EVM 체인 추가 기반 마련 |
 
-1. 30분 기술 리뷰 발표 자료 목차를 만든다.
-2. “내일부터 무엇을 할 것인가” 체크리스트를 작성한다.
+## 다음 단계: 즉시 시작할 3개 Spike
 
-## 완료 기준
+1. **KMS Ed25519 Signing PoC** -- devnet에서 KMS 서명으로 SOL 전송 (1-2일)
+2. **Finalized Block Scan PoC** -- devnet에서 finalized 슬롯 스캔 + 전송 추출 (1-2일)
+3. **Durable Nonce Withdrawal PoC** -- devnet에서 nonce 생성 → TX 구성 → 전송 (2-3일)
 
-- 이 섹션의 핵심 개념을 EVM 현재 구조와 비교해서 설명할 수 있다.
-- 최소 1개 이상의 코드/쿼리/CLI PoC 또는 테스트 fixture가 있다.
-- 구현이 필요한 항목은 파일/컴포넌트/상태 전이/오류 처리 기준까지 쪼개져 있다.
-- 공식 문서나 실제 devnet/mainnet 응답으로 가정 하나 이상을 검증했다.
+이 세 가지 spike가 모두 성공하면 Phase 1 본격 착수.
 
-## 하위 header 폴더
+## 하위 상세 분석
 
-- [재사용 가능한 것:](./01-reusable-components/README.md)
-- [새로 구현해야 하는 것:](./02-new-components/README.md)
-- [오히려 좋아지는 것:](./03-improvements/README.md)
-
-## 참고 링크
-
-- Solana Transactions: https://solana.com/docs/core/transactions
-- Solana Fees: https://solana.com/docs/core/fees
-- Solana Durable Nonces: https://solana.com/docs/core/transactions/durable-nonces
-- Solana RPC HTTP: https://solana.com/docs/rpc/http
-- Transaction Confirmation & Expiration: https://solana.com/developers/guides/advanced/confirmation
-- Retrying Transactions: https://solana.com/developers/guides/advanced/retry
-- Add Solana to Your Exchange: https://solana.com/developers/guides/advanced/exchange
-- AWS KMS Key Spec Reference: https://docs.aws.amazon.com/kms/latest/developerguide/asymmetric-key-specs.html
+- [재사용 가능한 것](./01-reusable-components/README.md) -- 기존 Dagaon Core에서 그대로 쓸 수 있는 컴포넌트
+- [새로 구현해야 하는 것](./02-new-components/README.md) -- Solana 전용으로 새로 만들어야 하는 컴포넌트
+- [오히려 좋아지는 것](./03-improvements/README.md) -- Solana에서 EVM보다 나아지는 영역

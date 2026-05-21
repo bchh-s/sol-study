@@ -1,0 +1,19 @@
+{
+  "name": "block-sync-poc",
+  "version": "1.0.0",
+  "description": "Solana Block Sync PoC - Dagaon Core Block Publisher/Consumer 대응",
+  "scripts": {
+    "scan": "tsx block-scanner.ts"
+  },
+  "dependencies": {
+    "@solana/spl-token": "^0.4.12",
+    "@solana/web3.js": "^1.98.0",
+    "bs58": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.22.3",
+    "typescript": "^5.7.0"
+  }
+}

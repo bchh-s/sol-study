@@ -1,0 +1,21 @@
+{
+  "name": "solana-rpc-explorer",
+  "version": "1.0.0",
+  "description": "Solana RPC 메서드 학습용 실행 코드 - devnet 대상",
+  "main": "rpc-explorer.ts",
+  "scripts": {
+    "start": "npx tsx rpc-explorer.ts",
+    "build": "tsc",
+    "run:built": "node dist/rpc-explorer.js"
+  },
+  "dependencies": {
+    "@solana/web3.js": "^1.98.0",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/ws": "^8.5.13",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  }
+}

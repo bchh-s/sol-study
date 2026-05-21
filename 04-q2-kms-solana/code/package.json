@@ -1,0 +1,19 @@
+{
+  "name": "kms-solana-demo",
+  "version": "1.0.0",
+  "description": "KMS Ed25519 서명 데모 - Solana 트랜잭션 서명 워크플로우 시뮬레이션",
+  "scripts": {
+    "demo": "tsx key-signing-demo.ts"
+  },
+  "dependencies": {
+    "@solana/web3.js": "^1.98.0",
+    "bs58": "^5.0.0",
+    "tweetnacl": "^1.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.22.3",
+    "typescript": "^5.7.0"
+  }
+}

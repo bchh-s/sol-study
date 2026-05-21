@@ -1,59 +1,55 @@
 # 7. Solana 기초 개념 상세
 
-원문: ../solana-integration-research.md
+## 개요
 
-## 이 폴더의 목표
+Solana 체인 통합 구현에 필요한 기초 개념을 정리한다.
+EVM 개발 경험이 있는 엔지니어가 Solana로 전환할 때 반드시 이해해야 하는
+합의 메커니즘, 계정 모델, 토큰 시스템, 트랜잭션 구조, 프로그램 아키텍처를 다룬다.
 
-Solana 구현에 필요한 기본 개념을 코드 작성 가능한 수준까지 끌어올린다.
+Solana는 EVM과 근본적으로 다른 설계 철학을 가지고 있다:
 
-## 원문에서 먼저 볼 소제목
+| 관점 | EVM | Solana |
+|------|-----|--------|
+| 상태 저장 | 컨트랙트 내부 storage slots | 외부 account의 data 필드 |
+| 코드 실행 | 상태와 코드가 하나의 주소 | 코드(program)와 상태(account)가 분리 |
+| 합의 | PoS + finality gadget | PoH + Tower BFT |
+| 트랜잭션 | 단일 서명자 | 다중 서명자 |
+| 토큰 | 컨트랙트 내부 mapping | 별도 토큰 계정 (ATA) |
+| 수수료 | 글로벌 fee market | 로컬 fee market (프로그램별) |
 
-  - 7.1 합의 메커니즘
-  - 7.2 계정 모델
-  - 7.3 Associated Token Account (ATA)
-  - 7.4 Transaction 구조
-  - 7.5 프로그램 (스마트 컨트랙트)
+## 학습 순서
 
-## 개발할 내용
+1. **[7.1 합의 메커니즘](./07-01-consensus/README.md)** - PoH, Tower BFT, Leader Rotation
+2. **[7.2 계정 모델](./07-02-account-model/README.md)** - 5가지 필드, Rent, PDA
+3. **[7.3 Associated Token Account](./07-03-associated-token-account/README.md)** - ATA 도출, 생성, 비용
+4. **[7.4 Transaction 구조](./07-04-transaction-structure/README.md)** - Legacy vs v0, 1232 byte 제한, ALT
+5. **[7.5 프로그램](./07-05-programs/README.md)** - System/Token/ATA Program, CPI
 
-1. 프로젝트 내부 glossary를 만든다: slot, blockHeight, commitment, account, owner, program, ATA, PDA, CU.
-2. PublicKey/base58/lamports/token amount 변환 유틸과 테스트를 만든다.
-3. ATA derivation helper와 rent-exempt 조회 wrapper를 만든다.
-4. legacy transaction과 v0 transaction 사용 기준을 문서화한다.
+## 실습 코드
 
-## 공부할 내용
+- **[Account Explorer](./code/account-explorer.ts)** - devnet에서 다양한 계정 유형을 조회하고 비교하는 스크립트
 
-1. Account model: lamports/data/owner/executable/rent를 이해한다.
-2. PDA와 ATA address derivation을 직접 계산해본다.
-3. Transaction size 1232 bytes 제한과 ALT가 필요한 시점을 학습한다.
+## 핵심 용어 Glossary
 
-## 실습/검증 과제
-
-1. devnet에서 새 wallet 생성, airdrop, ATA 생성, SPL token balance 조회까지 CLI/SDK로 수행한다.
-2. 하나의 transaction에 여러 instruction을 넣고 atomic failure를 확인한다.
-
-## 완료 기준
-
-- 이 섹션의 핵심 개념을 EVM 현재 구조와 비교해서 설명할 수 있다.
-- 최소 1개 이상의 코드/쿼리/CLI PoC 또는 테스트 fixture가 있다.
-- 구현이 필요한 항목은 파일/컴포넌트/상태 전이/오류 처리 기준까지 쪼개져 있다.
-- 공식 문서나 실제 devnet/mainnet 응답으로 가정 하나 이상을 검증했다.
-
-## 하위 header 폴더
-
-- [7.1 합의 메커니즘](./07-01-consensus/README.md)
-- [7.2 계정 모델](./07-02-account-model/README.md)
-- [7.3 Associated Token Account (ATA)](./07-03-associated-token-account/README.md)
-- [7.4 Transaction 구조](./07-04-transaction-structure/README.md)
-- [7.5 프로그램 (스마트 컨트랙트)](./07-05-programs/README.md)
+| 용어 | 설명 |
+|------|------|
+| **Slot** | 블록 생산 시간 단위 (~400ms) |
+| **Block Height** | 생성된 블록의 순번 (slot != block height, 빈 슬롯 존재) |
+| **Epoch** | 432,000 슬롯 (~2일), stake 가중치 재계산 주기 |
+| **Commitment** | TX 확인 수준: `processed` → `confirmed` → `finalized` |
+| **Account** | Solana의 기본 저장 단위 (모든 것이 계정) |
+| **Owner** | 계정의 data를 수정할 수 있는 프로그램 |
+| **Lamports** | SOL의 최소 단위 (1 SOL = 1,000,000,000 lamports) |
+| **PDA** | Program Derived Address, 프로그램이 결정적으로 도출한 주소 |
+| **ATA** | Associated Token Account, 지갑+mint으로 결정되는 토큰 계정 |
+| **CU** | Compute Unit, 명령어 실행 비용 단위 |
 
 ## 참고 링크
 
-- Solana Transactions: https://solana.com/docs/core/transactions
-- Solana Fees: https://solana.com/docs/core/fees
-- Solana Durable Nonces: https://solana.com/docs/core/transactions/durable-nonces
-- Solana RPC HTTP: https://solana.com/docs/rpc/http
-- Transaction Confirmation & Expiration: https://solana.com/developers/guides/advanced/confirmation
-- Retrying Transactions: https://solana.com/developers/guides/advanced/retry
-- Add Solana to Your Exchange: https://solana.com/developers/guides/advanced/exchange
-- AWS KMS Key Spec Reference: https://docs.aws.amazon.com/kms/latest/developerguide/asymmetric-key-specs.html
+- [Solana Developer Docs](https://solana.com/docs)
+- [Solana Cookbook](https://solanacookbook.com)
+- [EVM to SVM Guide](https://solana.com/developers/evm-to-svm)
+- [Solana Transactions](https://solana.com/docs/core/transactions)
+- [Solana Fees](https://solana.com/docs/core/fees)
+- [Solana Account Model](https://solana.com/docs/core/accounts)
+- [SPL Token Documentation](https://spl.solana.com/token)

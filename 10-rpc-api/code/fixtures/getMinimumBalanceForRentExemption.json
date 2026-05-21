@@ -1,0 +1,22 @@
+{
+  "System Account (0 bytes)": {
+    "size": 0,
+    "lamports": 890880,
+    "sol": 0.00089088
+  },
+  "Nonce Account (80 bytes)": {
+    "size": 80,
+    "lamports": 1447680,
+    "sol": 0.00144768
+  },
+  "Mint Account (82 bytes)": {
+    "size": 82,
+    "lamports": 1461600,
+    "sol": 0.0014616
+  },
+  "Token Account (165 bytes)": {
+    "size": 165,
+    "lamports": 2039280,
+    "sol": 0.00203928
+  }
+}

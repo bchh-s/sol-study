@@ -1,0 +1,46 @@
+{
+  "duration": "5 seconds",
+  "count": 13,
+  "samples": [
+    {
+      "result": {
+        "slot": 463807623,
+        "parent": 463807622,
+        "root": 463807591
+      },
+      "subscription": 1860494
+    },
+    {
+      "result": {
+        "slot": 463807624,
+        "parent": 463807623,
+        "root": 463807592
+      },
+      "subscription": 1860494
+    },
+    {
+      "result": {
+        "slot": 463807625,
+        "parent": 463807624,
+        "root": 463807593
+      },
+      "subscription": 1860494
+    },
+    {
+      "result": {
+        "slot": 463807626,
+        "parent": 463807625,
+        "root": 463807594
+      },
+      "subscription": 1860494
+    },
+    {
+      "result": {
+        "slot": 463807627,
+        "parent": 463807626,
+        "root": 463807595
+      },
+      "subscription": 1860494
+    }
+  ]
+}

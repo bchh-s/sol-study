@@ -1,0 +1,20 @@
+{
+  "name": "solana-account-explorer",
+  "version": "1.0.0",
+  "description": "Solana devnet account explorer - 다양한 계정 유형을 조회하고 비교하는 학습용 스크립트",
+  "main": "account-explorer.ts",
+  "scripts": {
+    "start": "npx ts-node account-explorer.ts",
+    "build": "tsc",
+    "explore": "npx ts-node account-explorer.ts"
+  },
+  "dependencies": {
+    "@solana/spl-token": "^0.4.9",
+    "@solana/web3.js": "^1.98.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.0"
+  }
+}

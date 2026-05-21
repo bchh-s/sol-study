@@ -1,0 +1,12 @@
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "blockhash": "2ZqdY9qPLP16TrP6aqf1X71hXQ7H5HbNAMwKpTSBTpUm",
+    "previousBlockhash": "AhLYGQgb2eEJ2ZiufA2yfYRMyw84dUhvxqdnwD7zSCvc",
+    "parentSlot": 463807582,
+    "blockHeight": 451663774,
+    "blockTime": 1779330706,
+    "txCount": 42,
+    "firstTxSignature": "67bvHRCVQufVbwasULRTiDcLoXmxUcXDSokU8oVC8XgmU6p3DJp2HfRBKmCaYoshLmzcLq6gQbapUqGGXzFwSejG"
+  }
+}

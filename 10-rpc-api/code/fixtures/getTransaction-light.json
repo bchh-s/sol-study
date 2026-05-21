@@ -1,0 +1,19 @@
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "slot": 463807583,
+    "blockTime": 1779330706,
+    "signature": "67bvHRCVQufVbwasULRTiDcLoXmxUcXDSokU8oVC8XgmU6p3DJp2HfRBKmCaYoshLmzcLq6gQbapUqGGXzFwSejG",
+    "signatureLength": 88,
+    "meta": {
+      "err": null,
+      "fee": 5000,
+      "computeUnitsConsumed": 2100,
+      "logMessages": [
+        "Program Vote111111111111111111111111111111111111111 invoke [1]",
+        "Program Vote111111111111111111111111111111111111111 success"
+      ]
+    },
+    "version": "legacy"
+  }
+}

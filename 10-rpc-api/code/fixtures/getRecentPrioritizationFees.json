@@ -1,0 +1,51 @@
+{
+  "summary": {
+    "count": 150,
+    "min": 0,
+    "max": 0,
+    "median": 0,
+    "nonZeroCount": 0
+  },
+  "samples": [
+    {
+      "prioritizationFee": 0,
+      "slot": 463807470
+    },
+    {
+      "prioritizationFee": 0,
+      "slot": 463807471
+    },
+    {
+      "prioritizationFee": 0,
+      "slot": 463807472
+    },
+    {
+      "prioritizationFee": 0,
+      "slot": 463807473
+    },
+    {
+      "prioritizationFee": 0,
+      "slot": 463807474
+    },
+    {
+      "prioritizationFee": 0,
+      "slot": 463807475
+    },
+    {
+      "prioritizationFee": 0,
+      "slot": 463807476
+    },
+    {
+      "prioritizationFee": 0,
+      "slot": 463807477
+    },
+    {
+      "prioritizationFee": 0,
+      "slot": 463807478
+    },
+    {
+      "prioritizationFee": 0,
+      "slot": 463807479
+    }
+  ]
+}
