@@ -13,6 +13,56 @@ Solana: meta.preBalances vs meta.postBalances 비교 → diff > 0이면 수신
         meta.preTokenBalances vs meta.postTokenBalances 비교 → diff > 0이면 토큰 수신
 ```
 
+## 왜 trace 없이 모든 SOL 이동을 알 수 있는가
+
+balance diff 방식이 성립하는 **근본 이유**다. EVM과 비교하면 명확해진다.
+
+### EVM: internal transaction은 trace가 필요
+
+EVM에서는 컨트랙트가 실행 도중 내부적으로 ETH를 또 전송할 수 있다(internal transaction). 이 내부 전송은 `receipt`에 찍히지 않으므로, 익스플로러/인덱서는 `debug_traceTransaction`(또는 `trace_call`) 같은 **별도의 무거운 trace RPC**를 돌려야 숨은 이동을 잡는다.
+
+### Solana: 계정 사전 선언 모델 → 숨은 이동이 원천적으로 없음
+
+Solana의 핵심 규칙:
+
+```
+잔액이 바뀌는 계정은 반드시 트랜잭션의 accountKeys에 미리 선언되어 있어야 한다.
+(선언되지 않은 계정은 런타임이 접근을 막음 — 병렬 실행 Sealevel의 전제)
+```
+
+→ 런타임은 그 선언된 **모든 계정**의 실행 전/후 잔액을 `preBalances`/`postBalances`로 기록한다.
+→ 따라서 **"숨은 SOL 이동"이 존재할 수 없고**, 전/후 스냅샷의 diff만으로 그 TX의 SOL 흐름이 100% 재구성된다. **trace 불필요.**
+
+| | EVM | Solana |
+|---|---|---|
+| 네이티브 코인 추적 | internal tx는 **trace 필요** | **trace 불필요** (pre/postBalances가 완전) |
+| 왜? | 컨트랙트가 임의 계정에 송금 가능 | 건드릴 계정을 **전부 사전 선언** 강제 |
+| 내부 호출 내역 | `debug_traceTransaction` 별도 호출 | `meta.innerInstructions`로 **같은 응답에 포함** |
+| 배열 길이 | - | 1232바이트 제한 → 최대 ~256 계정 (→ [7.4](../../07-solana-basics/07-04-transaction-structure/README.md)) |
+
+### innerInstructions는 별도 RPC가 아니다
+
+EVM의 trace와 달리, Solana는 `getBlock()`/`getTransaction()` **한 번의 응답 안에** `meta.innerInstructions`(CPI로 내부 호출된 instruction)를 같이 준다. 추적용으로 따로 RPC를 칠 필요가 없다.
+
+```jsonc
+// getTransaction / getBlock 응답
+"meta": {
+  "preBalances":  [...],   "postBalances":  [...],
+  "preTokenBalances": [...], "postTokenBalances": [...],
+  "innerInstructions": [ { "index": 0, "instructions": [ /* CPI */ ] } ]
+}
+```
+
+### 단, diff는 "순변화(net)"만 알려준다
+
+balance diff는 각 계정의 **최종 순변화**만 보여준다. 한 TX 안에서 A→B→C로 흘렀다면:
+
+```
+A: -5 SOL    B: 0 SOL (받았다 그대로 전달)    C: +5 SOL
+```
+
+회계상 정산(누가 얼마 잃고 얻었나)은 완벽하지만, **중간 경로(hop)** 는 diff만으로 안 보일 수 있다. 경로까지 필요하면 `innerInstructions`를 파싱한다 (아래 `inner_instruction_index` 참고).
+
 ## CRITICAL: 실패 TX 필터링 (meta.err)
 
 **이 섹션에서 가장 중요한 내용이다.**
